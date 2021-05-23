@@ -15,17 +15,27 @@ let s:core_funcrefs = [
 
 
 function! airline#add_statusline_func(name)
-  call airline#add_statusline_funcref(function(a:name))
+  call airline#add_statusline_funcref(function(a:name), 1)
+endfunction
+
+function! airline#add_statusline_func_quiet(name)
+  call airline#add_statusline_funcref(function(a:name), 0)
+endfunction
+
+function! airline#add_inactive_statusline_func_quiet(name)
+  call airline#add_inactive_statusline_funcref(function(a:name), 0)
 endfunction
 
 function! airline#add_inactive_statusline_func(name)
-  call airline#add_inactive_statusline_funcref(function(a:name))
+  call airline#add_inactive_statusline_funcref(function(a:name), 1)
 endfunction
 
 
-function! airline#add_statusline_funcref(function)
+function! airline#add_statusline_funcref(function, warn)
   if index(g:airline_statusline_funcrefs, a:function) >= 0
-    call airline#util#warning(printf('The airline statusline funcref "%s" has already been added.', string(a:function)))
+    if a:warn > 0
+      call airline#util#warning(printf('The airline statusline funcref "%s" has already been added.', string(a:function)))
+    endif
     return
   endif
   call add(g:airline_statusline_funcrefs, a:function)
@@ -38,12 +48,13 @@ function! airline#remove_statusline_func(name)
   endif
 endfunction
 
-function! airline#add_inactive_statusline_funcref(function)
+function! airline#add_inactive_statusline_funcref(function, warn)
   if index(g:airline_inactive_funcrefs, a:function) >= 0
-    call airline#util#warning(printf('The airline inactive statusline funcref "%s" has already been added.', string(a:function)))
+    if a:warn > 0
+      call airline#util#warning(printf('The airline inactive statusline funcref "%s" has already been added.', string(a:function)))
+    endif
     return
   endif
-  call airline#util#warning(printf('Adding %s', string(a:function)))
   call add(g:airline_inactive_funcrefs, function(a:function))
 endfunction
 
