@@ -4,6 +4,7 @@
 scriptencoding utf-8
 
 let g:airline_statusline_funcrefs = get(g:, 'airline_statusline_funcrefs', [])
+let g:airline_inactive_funcrefs = get(g:, 'airline_inactive_statusline_funcrefs', [])
 
 let s:sections = ['a','b','c','gutter','x','y','z', 'error', 'warning']
 let s:inactive_funcrefs = []
@@ -16,6 +17,11 @@ let s:core_funcrefs = [
 function! airline#add_statusline_func(name)
   call airline#add_statusline_funcref(function(a:name))
 endfunction
+
+function! airline#add_inactive_statusline_func(name)
+  call airline#add_inactive_statusline_funcref(function(a:name))
+endfunction
+
 
 function! airline#add_statusline_funcref(function)
   if index(g:airline_statusline_funcrefs, a:function) >= 0
@@ -32,8 +38,13 @@ function! airline#remove_statusline_func(name)
   endif
 endfunction
 
-function! airline#add_inactive_statusline_func(name)
-  call add(s:inactive_funcrefs, function(a:name))
+function! airline#add_inactive_statusline_funcref(function)
+  if index(g:airline_inactive_funcrefs, a:function) >= 0
+    call airline#util#warning(printf('The airline inactive statusline funcref "%s" has already been added.', string(a:function)))
+    return
+  endif
+  call airline#util#warning(printf('Adding %s', string(a:function)))
+  call add(g:airline_inactive_funcrefs, function(a:function))
 endfunction
 
 function! airline#load_theme()
@@ -168,7 +179,7 @@ function! airline#update_statusline_inactive(range)
             \ 'left_sep': g:airline_left_alt_sep,
             \ 'right_sep': g:airline_right_alt_sep }, 'keep')
     endif
-    call s:invoke_funcrefs(context, s:inactive_funcrefs)
+    call s:invoke_funcrefs(context, g:airline_inactive_funcrefs)
   endfor
 endfunction
 
